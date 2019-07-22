@@ -76,6 +76,7 @@ class RedisClient(object):
         if score and score > MIN_SCORE:
             print(rediskey, '代理', proxy, '当前分数', score, '减1')
             return self.db.zincrby(rediskey, -1, proxy)
+
         else:
             print(rediskey, '代理', proxy, '当前分数', score, '移除')
             return self.db.zrem(rediskey, proxy)
@@ -110,6 +111,7 @@ class RedisClient(object):
             return self.db.zadd(REDIS_KEY, {proxy: MAX_SCORE})
 
     def count(self, mode=None):
+
         """
         获取数量
         :return: 数量
