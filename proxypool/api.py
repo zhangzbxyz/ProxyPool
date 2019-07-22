@@ -1,5 +1,5 @@
 from flask import Flask, g
-
+from proxypool.setting import REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, REDIS_KEY, REDIS_HTTPS, REDIS_HTTP
 from .db import RedisClient
 
 __all__ = ['app']
@@ -28,6 +28,18 @@ def get_proxy():
     return conn.random()
 
 
+@app.route('/https')
+def get_https_proxy():
+    conn = get_conn()
+    return conn.random(mode=REDIS_HTTPS)
+
+
+@app.route('/http')
+def get_http_proxy():
+    conn = get_conn()
+    return conn.random(mode=REDIS_HTTP)
+
+
 @app.route('/count')
 def get_counts():
     """
@@ -35,7 +47,11 @@ def get_counts():
     :return: 代理池总量
     """
     conn = get_conn()
-    return str(conn.count())
+
+    string = str(conn.count()) + "个代理，"+str(conn.count(REDIS_HTTP)) + "个http代理，"+str(conn.count(REDIS_HTTPS)) + "个https代理"+"\n" \
+        + str(conn.count_good(REDIS_HTTP)) + "个优质http代理，" + \
+        str(conn.count_good(REDIS_HTTPS)) + "个https优质代理"
+    return string
 
 
 if __name__ == '__main__':

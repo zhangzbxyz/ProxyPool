@@ -15,7 +15,9 @@ class Scheduler():
         tester = Tester()
         while True:
             print('测试器开始运行')
-            tester.run()
+            tester.run(mode = REDIS_HTTPS)
+            tester.run(mode = REDIS_HTTP)
+
             time.sleep(cycle)
     
     def schedule_getter(self, cycle=GETTER_CYCLE):

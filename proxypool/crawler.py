@@ -20,21 +20,25 @@ class Crawler(object, metaclass=ProxyMetaclass):
     def get_proxies(self, callback):
         proxies = []
         for proxy in eval("self.{}()".format(callback)):
-            print('成功获取到代理', proxy)
             proxies.append(proxy)
+        print('成功获取到代理', proxies)
         return proxies
-       
+
     def crawl_daili66(self, page_count=4):
         """
         获取代理66
         :param page_count: 页码
         :return: 代理
         """
+        headers = {
+            'Cookie':
+            '__jsluid_h=8974ae1c55ac92973e06cb7c02e328a0; __jsl_clearance=1563767595.253|0|Pz%2BMytUOFcz89vcIm%2FOA0svHmoo%3D; Hm_lvt_1761fabf3c988e7f04bec51acd4073f4=1563767598; Hm_lpvt_1761fabf3c988e7f04bec51acd4073f4=1563767598'
+        }
         start_url = 'http://www.66ip.cn/{}.html'
         urls = [start_url.format(page) for page in range(1, page_count + 1)]
         for url in urls:
             print('Crawling', url)
-            html = get_page(url)
+            html = get_page(url, headers)
             if html:
                 doc = pq(html)
                 trs = doc('.containerbox table tr:gt(0)').items()
@@ -45,52 +49,61 @@ class Crawler(object, metaclass=ProxyMetaclass):
 
     def crawl_ip3366(self):
         for page in range(1, 4):
-            start_url = 'http://www.ip3366.net/free/?stype=1&page={}'.format(page)
+            start_url = 'http://www.ip3366.net/free/?stype=1&page={}'.format(
+                page)
             html = get_page(start_url)
             ip_address = re.compile('<tr>\s*<td>(.*?)</td>\s*<td>(.*?)</td>')
             # \s * 匹配空格，起到换行作用
             re_ip_address = ip_address.findall(html)
             for address, port in re_ip_address:
-                result = address+':'+ port
+                result = address + ':' + port
                 yield result.replace(' ', '')
-    
+
     def crawl_kuaidaili(self):
         for i in range(1, 4):
             start_url = 'http://www.kuaidaili.com/free/inha/{}/'.format(i)
-            html = get_page(start_url)
+
+            headers = {
+                'Cookie':
+                'channelid=0; sid=1563768857362954; _ga=GA1.2.1368460970.1563769321; _gid=GA1.2.1083248836.1563769321; _gat=1; Hm_lvt_7ed65b1cc4b810e9fd37959c9bb51b31=1563769321; Hm_lpvt_7ed65b1cc4b810e9fd37959c9bb51b31=1563769336'
+            }
+
+            html = get_page(start_url, headers)
             if html:
-                ip_address = re.compile('<td data-title="IP">(.*?)</td>') 
+                ip_address = re.compile('<td data-title="IP">(.*?)</td>')
                 re_ip_address = ip_address.findall(html)
                 port = re.compile('<td data-title="PORT">(.*?)</td>')
                 re_port = port.findall(html)
-                for address,port in zip(re_ip_address, re_port):
-                    address_port = address+':'+port
-                    yield address_port.replace(' ','')
+                for address, port in zip(re_ip_address, re_port):
+                    address_port = address + ':' + port
+                    yield address_port.replace(' ', '')
 
     def crawl_xicidaili(self):
         for i in range(1, 3):
             start_url = 'http://www.xicidaili.com/nn/{}'.format(i)
             headers = {
-                'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-                'Cookie':'_free_proxy_session=BAh7B0kiD3Nlc3Npb25faWQGOgZFVEkiJWRjYzc5MmM1MTBiMDMzYTUzNTZjNzA4NjBhNWRjZjliBjsAVEkiEF9jc3JmX3Rva2VuBjsARkkiMUp6S2tXT3g5a0FCT01ndzlmWWZqRVJNek1WanRuUDBCbTJUN21GMTBKd3M9BjsARg%3D%3D--2a69429cb2115c6a0cc9a86e0ebe2800c0d471b3',
-                'Host':'www.xicidaili.com',
-                'Referer':'http://www.xicidaili.com/nn/3',
-                'Upgrade-Insecure-Requests':'1',
+                'Accept':
+                'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+                'Cookie':
+                '_free_proxy_session=BAh7B0kiD3Nlc3Npb25faWQGOgZFVEkiJWRjYzc5MmM1MTBiMDMzYTUzNTZjNzA4NjBhNWRjZjliBjsAVEkiEF9jc3JmX3Rva2VuBjsARkkiMUp6S2tXT3g5a0FCT01ndzlmWWZqRVJNek1WanRuUDBCbTJUN21GMTBKd3M9BjsARg%3D%3D--2a69429cb2115c6a0cc9a86e0ebe2800c0d471b3',
+                'Host': 'www.xicidaili.com',
+                'Referer': 'http://www.xicidaili.com/nn/3',
+                'Upgrade-Insecure-Requests': '1',
             }
             html = get_page(start_url, options=headers)
             if html:
                 find_trs = re.compile('<tr class.*?>(.*?)</tr>', re.S)
                 trs = find_trs.findall(html)
                 for tr in trs:
-                    find_ip = re.compile('<td>(\d+\.\d+\.\d+\.\d+)</td>') 
+                    find_ip = re.compile('<td>(\d+\.\d+\.\d+\.\d+)</td>')
                     re_ip_address = find_ip.findall(tr)
                     find_port = re.compile('<td>(\d+)</td>')
                     re_port = find_port.findall(tr)
-                    for address,port in zip(re_ip_address, re_port):
-                        address_port = address+':'+port
-                        yield address_port.replace(' ','')
-    
-    def crawl_ip3366(self):
+                    for address, port in zip(re_ip_address, re_port):
+                        address_port = address + ':' + port
+                        yield address_port.replace(' ', '')
+
+    def crawl_ip3366_new(self):
         for i in range(1, 4):
             start_url = 'http://www.ip3366.net/?stype=1&page={}'.format(i)
             html = get_page(start_url)
@@ -102,10 +115,10 @@ class Crawler(object, metaclass=ProxyMetaclass):
                     re_ip_address = find_ip.findall(trs[s])
                     find_port = re.compile('<td>(\d+)</td>')
                     re_port = find_port.findall(trs[s])
-                    for address,port in zip(re_ip_address, re_port):
-                        address_port = address+':'+port
-                        yield address_port.replace(' ','')
-    
+                    for address, port in zip(re_ip_address, re_port):
+                        address_port = address + ':' + port
+                        yield address_port.replace(' ', '')
+
     def crawl_iphai(self):
         start_url = 'http://www.iphai.com/'
         html = get_page(start_url)
@@ -113,35 +126,45 @@ class Crawler(object, metaclass=ProxyMetaclass):
             find_tr = re.compile('<tr>(.*?)</tr>', re.S)
             trs = find_tr.findall(html)
             for s in range(1, len(trs)):
-                find_ip = re.compile('<td>\s+(\d+\.\d+\.\d+\.\d+)\s+</td>', re.S)
+                find_ip = re.compile('<td>\s+(\d+\.\d+\.\d+\.\d+)\s+</td>',
+                                     re.S)
                 re_ip_address = find_ip.findall(trs[s])
                 find_port = re.compile('<td>\s+(\d+)\s+</td>', re.S)
                 re_port = find_port.findall(trs[s])
-                for address,port in zip(re_ip_address, re_port):
-                    address_port = address+':'+port
-                    yield address_port.replace(' ','')
+                for address, port in zip(re_ip_address, re_port):
+                    address_port = address + ':' + port
+                    yield address_port.replace(' ', '')
 
     def crawl_data5u(self):
         start_url = 'http://www.data5u.com/free/gngn/index.shtml'
         headers = {
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-            'Accept-Encoding': 'gzip, deflate',
-            'Accept-Language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
-            'Cache-Control': 'max-age=0',
-            'Connection': 'keep-alive',
-            'Cookie': 'JSESSIONID=47AA0C887112A2D83EE040405F837A86',
-            'Host': 'www.data5u.com',
-            'Referer': 'http://www.data5u.com/free/index.shtml',
-            'Upgrade-Insecure-Requests': '1',
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.108 Safari/537.36',
+            'Accept':
+            'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Encoding':
+            'gzip, deflate',
+            'Accept-Language':
+            'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+            'Cache-Control':
+            'max-age=0',
+            'Connection':
+            'keep-alive',
+            'Cookie':
+            'JSESSIONID=47AA0C887112A2D83EE040405F837A86',
+            'Host':
+            'www.data5u.com',
+            'Referer':
+            'http://www.data5u.com/free/index.shtml',
+            'Upgrade-Insecure-Requests':
+            '1',
+            'User-Agent':
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.108 Safari/537.36',
         }
         html = get_page(start_url, options=headers)
         if html:
-            ip_address = re.compile('<span><li>(\d+\.\d+\.\d+\.\d+)</li>.*?<li class=\"port.*?>(\d+)</li>', re.S)
+            ip_address = re.compile(
+                '<span><li>(\d+\.\d+\.\d+\.\d+)</li>.*?<li class=\"port.*?>(\d+)</li>',
+                re.S)
             re_ip_address = ip_address.findall(html)
             for address, port in re_ip_address:
                 result = address + ':' + port
                 yield result.replace(' ', '')
-
-
-            
