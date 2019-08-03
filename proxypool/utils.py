@@ -1,7 +1,8 @@
 import requests
 from requests.exceptions import ConnectionError
 from .db import RedisClient
-from proxypool.setting import REDIS_KEY, REDIS_HTTPS, REDIS_HTTP, START_PROXY
+from proxypool.setting import REDIS_KEY, REDIS_HTTPS, REDIS_HTTP, START_PROXY, LOGGERNAME
+import logging
 
 base_headers = {
     'User-Agent':
@@ -27,34 +28,35 @@ def get_page(url, options={}):
     :param options:
     :return:
     """
+    spider_log = logging.getLogger(LOGGERNAME)
     headers = dict(base_headers, **options)
-    print('正在抓取', url)
+    spider_log.info('正在抓取:' + url)
     try:
         response = requests.get(url, headers=headers, proxies=START_PROXY)
         if response.status_code == 200:
-            print('抓取成功', url, response.status_code)
+            spider_log.info('抓取成功' + url + str(response.status_code))
             return response.text
         else:
-            print('更换ip重试', url)
-            randamproxy = getnewproxy
+            spider_log.info('更换ip重试' + url)
+            randamproxy = getnewproxy()
             response = requests.get(url, headers=headers, proxies=randamproxy)
             if response.status_code == 200:
-                print('抓取成功', url, response.status_code)
+                spider_log.info('抓取成功' + url + str(response.status_code))
                 return response.text
             else:
-                print('抓取失败', url, response.status_code)
+                spider_log.warning('抓取失败' + url + str(response.status_code))
                 return None
     except ConnectionError:
-        print('更换ip重试', url)
-        randamproxy = getnewproxy
+        spider_log.info('更换ip重试' + url)
+        randamproxy = getnewproxy()
         try:
             response = requests.get(url, headers=headers, proxies=randamproxy)
             if response.status_code == 200:
-                print('抓取成功', url, response.status_code)
+                spider_log.info('抓取成功' + url + str(response.status_code))
                 return response.text
             else:
-                print('抓取失败', url, response.status_code)
+                spider_log.error('抓取失败' + url + str(response.status_code))
                 return None
         except ConnectionError:
-            print('抓取失败', url)
+            spider_log.error('抓取失败' + url)
             return None

@@ -1,9 +1,10 @@
 import redis
 from proxypool.error import PoolEmptyError
-from proxypool.setting import REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, REDIS_KEY, REDIS_HTTPS, REDIS_HTTP
+from proxypool.setting import REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, REDIS_KEY, REDIS_HTTPS, REDIS_HTTP, LOGGERNAME
 from proxypool.setting import MAX_SCORE, MIN_SCORE, INITIAL_SCORE
 from random import choice
 import re
+import logging
 
 
 class RedisClient(object):
@@ -21,6 +22,7 @@ class RedisClient(object):
                                     port=port,
                                     password=password,
                                     decode_responses=True)
+        self.spider_log = logging.getLogger(LOGGERNAME)
 
     def add(self, proxy, score=INITIAL_SCORE, mode=None):
         """
@@ -30,7 +32,7 @@ class RedisClient(object):
         :return: 添加结果
         """
         if not re.match('\d+\.\d+\.\d+\.\d+\:\d+', proxy):
-            print('代理不符合规范', proxy, '丢弃')
+            self.spider_log.warning('代理不符合规范' + proxy + '丢弃')
             return
 
         if mode is None:
@@ -74,11 +76,14 @@ class RedisClient(object):
 
         score = self.db.zscore(rediskey, proxy)
         if score and score > MIN_SCORE:
-            print(rediskey, '代理', proxy, '当前分数', score, '减1')
-            return self.db.zincrby(rediskey, -1, proxy)
+            self.spider_log.info(rediskey + '代理' + proxy + '当前分数' +
+                                 str(score) + '减5')
+
+            return self.db.zincrby(rediskey, -5, proxy)
 
         else:
-            print(rediskey, '代理', proxy, '当前分数', score, '移除')
+            self.spider_log.info(rediskey + '代理' + proxy + '当前分数' +
+                                 str(score) + '移除')
             return self.db.zrem(rediskey, proxy)
 
     def exists(self, proxy, mode=None):
@@ -92,7 +97,7 @@ class RedisClient(object):
         else:
             rediskey = mode
 
-        return not self.db.zscore(rediskey, proxy) == None
+        return not self.db.zscore(rediskey, proxy) is None
 
     def max(self, proxy, mode=None):
         """
@@ -102,16 +107,15 @@ class RedisClient(object):
         """
 
         if mode == REDIS_HTTP:
-            print('代理', proxy, '可用，设置为', MAX_SCORE)
+            self.spider_log.info('http代理' + proxy + '可用，设置为' + str(MAX_SCORE))
             return self.db.zadd(REDIS_HTTP, {proxy: MAX_SCORE})
         elif mode == REDIS_HTTPS:
-            print('代理', proxy, '可用，设置为', MAX_SCORE)
+            self.spider_log.info('https代理' + proxy + '可用，设置为' + str(MAX_SCORE))
             return self.db.zadd(REDIS_HTTPS, {proxy: MAX_SCORE})
         else:
             return self.db.zadd(REDIS_KEY, {proxy: MAX_SCORE})
 
     def count(self, mode=None):
-
         """
         获取数量
         :return: 数量

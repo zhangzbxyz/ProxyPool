@@ -1,7 +1,6 @@
-from flask import Flask, g
+from flask import Flask, g, make_response
 from proxypool.setting import REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, REDIS_KEY, REDIS_HTTPS, REDIS_HTTP
 from .db import RedisClient
-
 __all__ = ['app']
 
 app = Flask(__name__)
@@ -38,6 +37,15 @@ def get_https_proxy():
 def get_http_proxy():
     conn = get_conn()
     return conn.random(mode=REDIS_HTTP)
+
+
+@app.route('/log')
+def get_logger():
+    # base_dir = os.path.dirname(__file__)
+    # resp = make_response(base_dir)
+    resp = make_response(open('proxypool.log').read())
+    resp.headers["Content-type"] = "text/plan;charset=UTF-8"
+    return resp
 
 
 @app.route('/count')

@@ -2,6 +2,8 @@ import json
 import re
 from .utils import get_page
 from pyquery import PyQuery as pq
+import logging
+from proxypool.setting import *
 
 
 class ProxyMetaclass(type):
@@ -17,14 +19,20 @@ class ProxyMetaclass(type):
 
 
 class Crawler(object, metaclass=ProxyMetaclass):
+    def __init__(self):
+        self.spider_log = logging.getLogger(LOGGERNAME)
+
     def get_proxies(self, callback):
         proxies = []
         for proxy in eval("self.{}()".format(callback)):
             proxies.append(proxy)
-        print('成功获取到代理', proxies)
+        if len(proxies) != 0:
+            self.spider_log.info('成功获取到代理' + str(proxies))
+        else:
+            self.spider_log.warning('无法获取代理')
         return proxies
 
-    def crawl_daili66(self, page_count=4):
+    def crawl_daili66ip(self, page_count=4):
         """
         获取代理66
         :param page_count: 页码
@@ -37,7 +45,6 @@ class Crawler(object, metaclass=ProxyMetaclass):
         start_url = 'http://www.66ip.cn/{}.html'
         urls = [start_url.format(page) for page in range(1, page_count + 1)]
         for url in urls:
-            print('Crawling', url)
             html = get_page(url, headers)
             if html:
                 doc = pq(html)
