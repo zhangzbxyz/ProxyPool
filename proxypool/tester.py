@@ -62,7 +62,7 @@ class Tester(object):
                     aiohttp.client_exceptions.ClientConnectorError,
                     asyncio.TimeoutError, AttributeError):
                 self.redis.decrease(proxy, mode)
-                self.spider_log.warn(proxy_prefix + '代理请求失败' + proxy)
+                # self.spider_log.warn(proxy_prefix + '代理请求失败' + proxy)
 
     def run(self, mode=None):
         """

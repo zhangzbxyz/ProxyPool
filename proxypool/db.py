@@ -76,13 +76,13 @@ class RedisClient(object):
 
         score = self.db.zscore(rediskey, proxy)
         if score and score > MIN_SCORE:
-            self.spider_log.info(rediskey + '代理' + proxy + '当前分数' +
+            self.spider_log.warning(rediskey + '代理' + proxy + '请求失败当前分数' +
                                  str(score) + '减5')
 
             return self.db.zincrby(rediskey, -5, proxy)
 
         else:
-            self.spider_log.info(rediskey + '代理' + proxy + '当前分数' +
+            self.spider_log.warning(rediskey + '代理' + proxy + '请求失败当前分数' +
                                  str(score) + '移除')
             return self.db.zrem(rediskey, proxy)
 
