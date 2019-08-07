@@ -21,8 +21,6 @@ class Scheduler():
         while True:
             self.spider_log.info('测试器定时开始')
             tester.run(mode)
-            # tester.run(mode=REDIS_HTTP)
-
             time.sleep(cycle)
 
     def schedule_getter(self, cycle=GETTER_CYCLE):
@@ -30,10 +28,13 @@ class Scheduler():
         定时获取代理
         """
         getter = Getter()
-        while True:
-            self.spider_log.info('代理抓取定时开始')
-            getter.run()
-            time.sleep(cycle)
+        try:
+            while True:
+                self.spider_log.info('代理获取定时开始')
+                getter.run()
+                time.sleep(cycle)
+        except Exception as e:
+            self.spider_log.error('获取器进程发生错误，已退出' + str(e.args))
 
     def schedule_api(self):
         """

@@ -43,7 +43,7 @@ def get_http_proxy():
 def get_logger():
     # base_dir = os.path.dirname(__file__)
     # resp = make_response(base_dir)
-    logfile = open('proxypool.log', 'r')
+    logfile = open('/log/proxypool/proxypool.log', 'r')
     logtext = ''
     logtext = logtext.join(logfile.readlines()[-100:])
     # logtext = logfile.read()
@@ -51,6 +51,15 @@ def get_logger():
     resp = make_response(str(logtext))
     resp.headers["Content-type"] = "text/plan;charset=UTF-8"
     # logfile.close()
+    return resp
+
+
+@app.route('/error')
+def get_error():
+    logfile = open('/log/proxypool/proxypool_error.log', 'r')
+    logtext = logfile.read()
+    resp = make_response(str(logtext))
+    resp.headers["Content-type"] = "text/plan;charset=UTF-8"
     return resp
 
 

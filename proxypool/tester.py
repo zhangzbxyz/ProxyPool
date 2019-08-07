@@ -74,10 +74,9 @@ class Tester(object):
         else:
             rediskey = mode
         try:
-            self.spider_log.info('测试器开始运行')
-
             count = self.redis.count(mode)
-            self.spider_log.info(rediskey + '当前剩余' + str(count) + '个代理')
+            self.spider_log.info('测试器开始运行' + rediskey + '当前剩余' + str(count) +
+                                 '个代理')
 
             for i in range(0, count, BATCH_TEST_SIZE):
                 start = i

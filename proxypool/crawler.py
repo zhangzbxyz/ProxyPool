@@ -29,7 +29,7 @@ class Crawler(object, metaclass=ProxyMetaclass):
         if len(proxies) != 0:
             self.spider_log.info('成功获取到代理' + str(proxies))
         else:
-            self.spider_log.warning('无法获取代理')
+            self.spider_log.error('无法获取代理')
         return proxies
 
     def crawl_daili66ip(self, page_count=4):

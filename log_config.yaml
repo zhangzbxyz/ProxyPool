@@ -17,11 +17,20 @@ handlers:
     mode: 'w'
     formatter: simple
     level: INFO
-    filename: 'proxypool.log'
+    filename: '/log/proxypool/proxypool.log'
+  errorfile:
+    class : logging.handlers.TimedRotatingFileHandler
+    # mode: 'a'
+    formatter: simple
+    when: midnight
+    # maxBytes: 10485760 # 10MB
+    # backupCount: 20
+    level: ERROR
+    filename: '/log/proxypool/proxypool_error.log'
 loggers:
   proxypool:
     level: INFO
-    handlers: [console, file]
+    handlers: [console, file, errorfile]
 # root:
 #   level: INFO
 #   handlers: [console]

@@ -40,7 +40,7 @@ python3 run.py
 ```python
 import requests
 
-PROXY_POOL_URL = 'http://localhost:5555/random'
+PROXY_POOL_URL = 'http://localhost:8989/http'
 
 def get_proxy():
     try:

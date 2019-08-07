@@ -36,8 +36,9 @@ class Getter():
             httpsflag = 1
 
         if httpflag == 1 or httpsflag == 1:
-            self.spider_log.info('获取器开始执行,' + str(self.redis.count(REDIS_HTTP)) +
-                                 ";" + str(self.redis.count(REDIS_HTTPS)))
+            self.spider_log.info('获取器开始执行,' +
+                                 str(self.redis.count(REDIS_HTTP)) + ";" +
+                                 str(self.redis.count(REDIS_HTTPS)))
 
             for callback_label in range(self.crawler.__CrawlFuncCount__):
                 callback = self.crawler.__CrawlFunc__[callback_label]
