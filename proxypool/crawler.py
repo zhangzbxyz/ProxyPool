@@ -1,4 +1,3 @@
-import json
 import re
 from .utils import get_page
 from pyquery import PyQuery as pq
@@ -19,6 +18,7 @@ class ProxyMetaclass(type):
 
 
 class Crawler(object, metaclass=ProxyMetaclass):
+
     def __init__(self):
         self.spider_log = logging.getLogger(LOGGERNAME)
 
@@ -29,7 +29,7 @@ class Crawler(object, metaclass=ProxyMetaclass):
         if len(proxies) != 0:
             self.spider_log.info('成功获取到代理' + str(proxies))
         else:
-            self.spider_log.error('无法获取代理')
+            self.spider_log.error('无法获取代理' + str(callback))
         return proxies
 
     def crawl_daili66ip(self, page_count=4):

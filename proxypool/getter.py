@@ -7,6 +7,11 @@ import logging
 
 
 class Getter():
+    crawler_list = [
+        "crawl_ip3366", "crawl_kuaidaili", "crawl_ip3366_new", "crawl_iphai",
+        "crawl_data5u"
+    ]
+
     def __init__(self):
         self.spider_log = logging.getLogger(LOGGERNAME)
         self.redis = RedisClient()
@@ -39,10 +44,12 @@ class Getter():
             self.spider_log.info('获取器开始执行,' +
                                  str(self.redis.count(REDIS_HTTP)) + ";" +
                                  str(self.redis.count(REDIS_HTTPS)))
-
+            # if True:
             for callback_label in range(self.crawler.__CrawlFuncCount__):
                 callback = self.crawler.__CrawlFunc__[callback_label]
                 # 获取代理
+                if callback not in Getter.crawler_list:
+                    continue
                 self.spider_log.info('开始获取：' + callback)
                 proxies = self.crawler.get_proxies(callback)
                 sys.stdout.flush()

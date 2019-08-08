@@ -7,6 +7,7 @@ from proxypool.tester import Tester
 from proxypool.db import RedisClient
 from proxypool.setting import *
 import logging
+import traceback
 
 
 class Scheduler():
@@ -34,7 +35,8 @@ class Scheduler():
                 getter.run()
                 time.sleep(cycle)
         except Exception as e:
-            self.spider_log.error('获取器进程发生错误，已退出' + str(e.args))
+            self.spider_log.critical('获取器进程发生错误，已退出' + str(e.args))
+            self.spider_log.critical('traceback:' + traceback.format_exc())
 
     def schedule_api(self):
         """

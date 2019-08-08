@@ -1,6 +1,7 @@
 import asyncio
 import aiohttp
 import time
+import traceback
 import sys
 try:
     from aiohttp import ClientError
@@ -94,3 +95,4 @@ class Tester(object):
                 time.sleep(5)
         except Exception as e:
             self.spider_log.error('测试器发生错误' + str(e.args))
+            self.spider_log.error('traceback:' + traceback.format_exc())
