@@ -9,28 +9,40 @@ formatters:
     datefmt: "%Y %a %d %H:%M:%S"
 handlers:
   console:
-    class : logging.StreamHandler
+    class: logging.StreamHandler
     formatter: brief
-    level   : INFO
-  file:
-    class : logging.FileHandler
-    mode: 'w'
-    formatter: simple
     level: INFO
-    filename: '/log/proxypool/proxypool.log'
-  errorfile:
-    class : logging.handlers.TimedRotatingFileHandler
+  file:
+    class: logging.handlers.TimedRotatingFileHandler
+    formatter: simple
+    when: midnight
+    level: INFO
+    filename: "/log/proxypool/proxypool.log"
+  getterfile:
+    class: logging.handlers.TimedRotatingFileHandler
+    formatter: simple
+    when: midnight
+    level: INFO
+    filename: "/log/proxypool/proxypool-getter.log"
+  testerfile:
+    class: logging.handlers.TimedRotatingFileHandler
     # mode: 'a'
     formatter: simple
     when: midnight
     # maxBytes: 10485760 # 10MB
     # backupCount: 20
-    level: ERROR
-    filename: '/log/proxypool/proxypool_error.log'
+    level: INFO
+    filename: "/log/proxypool/proxypool-tester.log"
 loggers:
+  proxypool-getter:
+    level: INFO
+    handlers: [console, getterfile]
+  proxypool-tester:
+    level: INFO
+    handlers: [console, testerfile]
   proxypool:
     level: INFO
-    handlers: [console, file, errorfile]
+    handlers: [console, file]
 # root:
 #   level: INFO
 #   handlers: [console]

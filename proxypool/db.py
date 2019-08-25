@@ -1,6 +1,6 @@
 import redis
 from proxypool.error import PoolEmptyError
-from proxypool.setting import REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, REDIS_KEY, REDIS_HTTPS, REDIS_HTTP, LOGGERNAME
+from proxypool.setting import REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, REDIS_KEY, REDIS_HTTPS, REDIS_HTTP, LOGGERNAME, TESTLOGGER
 from proxypool.setting import MAX_SCORE, MIN_SCORE, INITIAL_SCORE
 from random import choice
 import re
@@ -22,7 +22,7 @@ class RedisClient(object):
                                     port=port,
                                     password=password,
                                     decode_responses=True)
-        self.spider_log = logging.getLogger(LOGGERNAME)
+        self.spider_log = logging.getLogger(TESTLOGGER)
 
     def add(self, proxy, score=INITIAL_SCORE, mode=None):
         """

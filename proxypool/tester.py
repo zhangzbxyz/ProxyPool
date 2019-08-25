@@ -8,14 +8,14 @@ try:
 except:
     from aiohttp import ClientProxyConnectionError as ProxyConnectionError
 from proxypool.db import RedisClient
-from proxypool.setting import *
 import logging
+from proxypool.setting import REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, REDIS_KEY, REDIS_HTTPS, REDIS_HTTP, LOGGERNAME, TESTLOGGER, GETTERLOGGER, POOL_UPPER_THRESHOLD, TEST_URL, HTTPSTEST_URL, VALID_STATUS_CODES, BATCH_TEST_SIZE
 
 
 class Tester(object):
     def __init__(self):
         self.redis = RedisClient()
-        self.spider_log = logging.getLogger(LOGGERNAME)
+        self.spider_log = logging.getLogger(TESTLOGGER)
 
     async def test_single_proxy(self, proxy, mode=None):
         """
@@ -70,6 +70,8 @@ class Tester(object):
         测试主函数
         :return:
         """
+        self.spider_log.info('测试器定时开始')
+
         if mode is None:
             rediskey = REDIS_KEY
         else:

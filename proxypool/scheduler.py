@@ -7,12 +7,11 @@ from proxypool.tester import Tester
 from proxypool.db import RedisClient
 from proxypool.setting import *
 import logging
-import traceback
 
 
 class Scheduler():
-    def __init__(self):
-        self.spider_log = logging.getLogger(LOGGERNAME)
+    # def __init__(self):
+    # self.spider_log = logging.getLogger(LOGGERNAME)
 
     def schedule_tester(self, cycle=TESTER_CYCLE, mode=None):
         """
@@ -20,7 +19,6 @@ class Scheduler():
         """
         tester = Tester()
         while True:
-            self.spider_log.info('测试器定时开始')
             tester.run(mode)
             time.sleep(cycle)
 
@@ -29,24 +27,19 @@ class Scheduler():
         定时获取代理
         """
         getter = Getter()
-        try:
-            while True:
-                self.spider_log.info('代理获取定时开始')
-                getter.run()
-                time.sleep(cycle)
-        except Exception as e:
-            self.spider_log.critical('获取器进程发生错误，已退出' + str(e.args))
-            self.spider_log.critical('traceback:' + traceback.format_exc())
+        while True:
+            getter.run()
+            time.sleep(cycle)
 
     def schedule_api(self):
         """
         开启API
         """
-        self.spider_log.info('代理API启动')
+        # self.spider_log.info('代理API启动')
         app.run(API_HOST, API_PORT)
 
     def run(self):
-        self.spider_log.info('代理池开始运行')
+        # self.spider_log.info('代理池开始运行')
 
         if TESTER_ENABLED:
             tester_process = Process(target=self.schedule_tester,

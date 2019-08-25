@@ -46,3 +46,5 @@ BATCH_TEST_SIZE = 3
 START_PROXY = None
 
 LOGGERNAME = 'proxypool'
+TESTLOGGER = 'proxypool-tester'
+GETTERLOGGER = 'proxypool-getter'
